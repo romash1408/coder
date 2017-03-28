@@ -2,19 +2,24 @@
 #define CODER_H
 
 #include <inttypes.h>
+#include <stdio.h>
+
+typedef unsigned char byte;
 
 enum {
-    MaxCodeLength = 4
+    MaxCodeLength = 4,
 };
 
 typedef struct {
     uint8_t code[MaxCodeLength];
     size_t length;
-} CodeUnits;
+} CodeUnit;
 
-int encode(uint32_t code_point, CodeUnits *code_units);
+int encode(uint32_t code_point, CodeUnit *code_units);
 uint32_t decode(const CodeUnit *code_unit);
-int read_next_code_unit(FILE *in, CodeUnits *code_units);
+int read_next_code_unit(FILE *in, CodeUnit *code_units);
 int write_code_unit(FILE *out, const CodeUnit *code_unit);
+
+void print_code_unit(const CodeUnit *unit);
 
 #endif
