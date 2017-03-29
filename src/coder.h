@@ -4,14 +4,14 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-typedef unsigned char byte;
+typedef uint8_t byte;
 
 enum {
     MaxCodeLength = 4,
 };
 
 typedef struct {
-    uint8_t code[MaxCodeLength];
+    byte code[MaxCodeLength];
     size_t length;
 } CodeUnit;
 

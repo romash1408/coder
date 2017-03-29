@@ -9,11 +9,9 @@ int main(int argc, char** argv)
 	print_code_unit(&unit);
 	encode(0xC27A, &unit);//1100 0010 0111 1010
 	print_code_unit(&unit);
+	encode(0x3BAA10, &unit);
+	print_code_unit(&unit);
 	encode(0x3BAA1029, &unit);
-	print_code_unit(&unit);
-	encode(123, &unit);
-	print_code_unit(&unit);
-	encode(123, &unit);
 	print_code_unit(&unit);
 	return 0;
 }
