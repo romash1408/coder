@@ -41,8 +41,29 @@ uint32_t decode(const CodeUnit *code_unit)
 	return ret;
 }
 
+static int check_head_byte(const byte _head, const int _num)
+{
+	return !((_head & ~BodyMask[_num]) ^ Header[_num]);
+}
+
 int read_next_code_unit(FILE *in, CodeUnit *code_unit)
 {
+	if(!code_unit) return 1;
+	code_unit->length = 0;
+	
+	byte head, len;
+	do{
+		if(feof(in)) return 1;
+		fread(&head, 1, 1, in);
+	} while(check_head_byte(head, 0));
+	code_unit->code[0] = head;
+	
+	for(len = 1; len <= MaxCodeLength; ++len)
+		if(check_head_byte(head, len)) break;
+	
+	if(len > MaxCodeLength) return 1;
+	if(len > 1) if(fread(code_unit->code + 1, 1, len - 1, in) != len - 1) return 1;
+	code_unit->length = len;
 	return 0;
 }
 
