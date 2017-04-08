@@ -48,7 +48,7 @@ int read_next_code_unit(FILE *in, CodeUnit *code_unit)
 
 int write_code_unit(FILE *out, const CodeUnit *code_unit)
 {
-	return 0;
+	return fwrite(code_unit->code, sizeof(*code_unit->code), code_unit->length, out) != code_unit->length;
 }
 
 void print_code_unit(const CodeUnit *unit)
