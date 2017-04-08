@@ -1,10 +1,10 @@
 #include "coder.h"
 
-static const uint32_t MaxVal[] = {0, (1 << 7) - 1, (1 << 11) - 1, (1 << 16) - 1, (1 << 21) - 1};
-static const byte Header[] = {0x80, 0x00, 0xC0, 0xE0, 0xF0};
-static const char *HeaderStr[] = {"10", "0", "110", "1110", "11110"};
-static const byte BodyLen[] = {6, 7, 5, 4, 3};
-static const char BodyMask[] = {(1 << 6) - 1, (1 << 7) - 1, (1 << 5) - 1, (1 << 4) - 1, (1 << 3) - 1};
+static const uint32_t MaxVal[] = {0,	0x7F,	0x7FF,	0xFFFF,	0x1FFFFF,	0x3FFFFFF, 	0xFFFFFFFF};
+static const byte Header[] = 	 {0x80,	0x00,	0xC0, 	0xE0, 	0xF0, 		0xF8, 		0xFC};
+static const char *HeaderStr[] = {"10",	"0",	"110", 	"1110", "11110", 	"111110", 	"111111"};
+static const byte BodyLen[] = 	 {6,	7,		5, 		4,		3,			2,			2};
+static const char BodyMask[] = 	 {0x3F,	0x7F, 	0x1F, 	0x0F, 	0x07,		0x03,		0x03};
 
 int encode(uint32_t code_point, CodeUnit *code_unit)
 {
@@ -30,7 +30,15 @@ int encode(uint32_t code_point, CodeUnit *code_unit)
 
 uint32_t decode(const CodeUnit *code_unit)
 {
-	return 0;
+	uint32_t ret = 0;
+	ret = code_unit->code[0] & BodyMask[code_unit->length];
+	
+	for(int i = 1; i < code_unit->length; ++i)
+	{
+		ret <<= BodyLen[0];
+		ret += code_unit->code[i] & BodyMask[0];
+	}
+	return ret;
 }
 
 int read_next_code_unit(FILE *in, CodeUnit *code_unit)

@@ -7,7 +7,7 @@
 typedef uint8_t byte;
 
 enum {
-    MaxCodeLength = 4,
+    MaxCodeLength = 6,
 };
 
 typedef struct {
