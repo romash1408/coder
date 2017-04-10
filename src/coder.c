@@ -41,7 +41,7 @@ uint32_t decode(const CodeUnit *code_unit)
 	return ret;
 }
 
-static int check_head_byte(const byte _head, const int _num)
+static int check_byte_head(const byte _head, const int _num)
 {
 	return !((_head & ~BodyMask[_num]) ^ Header[_num]);
 }
@@ -51,20 +51,37 @@ int read_next_code_unit(FILE *in, CodeUnit *code_unit)
 	if(!code_unit) return 1;
 	code_unit->length = 0;
 	
-	byte head, len;
-	do{
-		if(feof(in)) return 1;
-		fread(&head, 1, 1, in);
-	} while(check_head_byte(head, 0));
-	code_unit->code[0] = head;
-	
-	for(len = 1; len <= MaxCodeLength; ++len)
-		if(check_head_byte(head, len)) break;
-	
-	if(len > MaxCodeLength) return 1;
-	if(len > 1) if(fread(code_unit->code + 1, 1, len - 1, in) != len - 1) return 1;
-	code_unit->length = len;
-	return 0;
+	byte next, len;
+	fread(&next, sizeof(next), 1, in);
+	while(!feof(in)){
+		if(check_byte_head(next, 0))
+		{
+			fread(&next, sizeof(next), 1, in);
+			continue;
+		}
+		code_unit->code[0] = next;
+		
+		for(len = 1; len <= MaxCodeLength; ++len)
+			if(check_byte_head(next, len)) break;
+		if(len > MaxCodeLength)
+		{
+			fread(&next, sizeof(next), 1, in);
+			continue;
+		}
+		
+		if(len == 1 && (code_unit->length = len)) return 0;
+		for(int i = 1; i < len; ++i)
+		{
+			fread(&next, sizeof(next), 1, in);
+			if(!check_byte_head(next, 0)) break;
+			code_unit->code[i] = next;
+		}
+		if(!check_byte_head(next, 0)) continue;
+		
+		code_unit->length = len;
+		return 0;
+	}
+	return 1;
 }
 
 int write_code_unit(FILE *out, const CodeUnit *code_unit)
