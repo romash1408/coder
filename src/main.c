@@ -5,43 +5,36 @@
 
 int main(int argc, char** argv)
 {
-	FILE* out = fopen("output", "rb");
-	if(!out)
+	if(argc < 4 )
 	{
-		printf("Error 0\n");
+		printf("Usage: %s encode|decode <input file> <output file>\n", argv[0]);
 		return 1;
 	}
-	CodeUnit unit;
 	
-	//encode(0x7B, &unit);//0111 1011
-	read_next_code_unit(out, &unit);
-	if(0x7B != decode(&unit))
-		printf("Error 1\n");
+	int result;
+	if(strcmp(argv[1], "encode") == 0)
+	{
+		result = encode_file(argv[2], argv[3]);
+	}
+	else if(strcmp(argv[1], "decode") == 0)
+	{
+		result = decode_file(argv[2], argv[3]);
+	}
 	else
-		print_code_unit(&unit);
+	{
+		printf("Undefined command %s. Please, use encode or decode.\n", argv[1]);
+		return 1;
+	}
 	
-	//encode(0xC27A, &unit);//1100 0010 0111 1010
-	read_next_code_unit(out, &unit);
-	if(0xC27A != decode(&unit))
-		printf("Error 2\n");
+	if(result == 0)
+	{
+		printf("All done successfully\n");
+	}
 	else
-		print_code_unit(&unit);
-	
-	//encode(0x3BAA10, &unit);
-	read_next_code_unit(out, &unit);
-	if(0x3BAA10 != decode(&unit))
-		printf("Error 3\n");
-	else
-		print_code_unit(&unit);
-	
-	//encode(0x3BAA1029, &unit);
-	read_next_code_unit(out, &unit);
-	if(0x3BAA1029 != decode(&unit))
-		printf("Error 4\n");
-	else
-		print_code_unit(&unit);
-	
-	fclose(out);
+	{
+		printf("Some troubles when %s :(\n", argv[1]);
+		return 1;
+	}
 	
 	return 0;
 }
